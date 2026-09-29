@@ -1,0 +1,403 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>You Still Remember? 😏</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+        radial-gradient(circle at 50% 35%, rgba(255, 40, 40, 0.18), transparent 35%),
+        linear-gradient(to bottom, #02030a 0%, #090b16 50%, #020205 100%);
+    color: white;
+}
+
+/* Stadium lights */
+.stadium-light {
+    position: absolute;
+    width: 35vw;
+    height: 35vw;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(255,255,255,0.22) 0%,
+        rgba(255,255,255,0.08) 30%,
+        transparent 70%
+    );
+    filter: blur(10px);
+    opacity: 0;
+    animation: lightsOn 3s forwards;
+}
+
+.light-left {
+    top: -15vw;
+    left: -10vw;
+}
+
+.light-right {
+    top: -15vw;
+    right: -10vw;
+    animation-delay: .5s;
+}
+
+/* Stadium glow */
+.stadium {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 35vh;
+    background:
+        linear-gradient(
+            to top,
+            #010101,
+            rgba(10,10,15,.8),
+            transparent
+        );
+}
+
+/* Crowd */
+.crowd {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 25vh;
+    background:
+        repeating-linear-gradient(
+            90deg,
+            #030303 0px,
+            #080808 8px,
+            #020202 16px
+        );
+    opacity: .8;
+}
+
+/* Main content */
+.container {
+    position: relative;
+    z-index: 5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Question */
+.question {
+    font-size: clamp(28px, 5vw, 65px);
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: questionIn 1.5s ease forwards;
+    animation-delay: 1.5s;
+    text-shadow: 0 0 25px rgba(255,255,255,.5);
+}
+
+/* Score */
+.score {
+    margin-top: 20px;
+    font-size: clamp(100px, 22vw, 260px);
+    line-height: .9;
+    font-weight: 900;
+    letter-spacing: 12px;
+
+    opacity: 0;
+    transform: scale(.4);
+
+    background: linear-gradient(
+        180deg,
+        #ffffff,
+        #ffdede,
+        #ff3030
+    );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+
+    text-shadow:
+        0 0 15px rgba(255,0,0,.5),
+        0 0 50px rgba(255,0,0,.35);
+
+    animation: scoreReveal 1.5s cubic-bezier(.17,.67,.3,1.3) forwards;
+    animation-delay: 3.5s;
+}
+
+/* Teams */
+.teams {
+    margin-top: 25px;
+    font-size: clamp(18px, 3vw, 32px);
+    font-weight: 700;
+    letter-spacing: 3px;
+
+    opacity: 0;
+    animation: fadeIn 1s ease forwards;
+    animation-delay: 5s;
+}
+
+.final {
+    margin-top: 12px;
+    font-size: clamp(14px, 2vw, 20px);
+    letter-spacing: 6px;
+    color: #d7d7d7;
+
+    opacity: 0;
+    animation: fadeIn 1s ease forwards;
+    animation-delay: 5.4s;
+}
+
+/* Button */
+button {
+    margin-top: 35px;
+    padding: 15px 30px;
+    border: 1px solid rgba(255,255,255,.4);
+    border-radius: 50px;
+    background: rgba(255,255,255,.08);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+
+    opacity: 0;
+    animation: fadeIn 1s ease forwards;
+    animation-delay: 5.8s;
+
+    transition: .3s ease;
+}
+
+button:hover {
+    background: rgba(255,50,50,.25);
+    transform: scale(1.08);
+    box-shadow: 0 0 25px rgba(255,50,50,.4);
+}
+
+/* Joke message */
+.message {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(.7);
+
+    width: min(90%, 600px);
+    padding: 35px;
+
+    background: rgba(5,5,10,.92);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 25px;
+
+    text-align: center;
+    z-index: 20;
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition: .5s ease;
+    backdrop-filter: blur(20px);
+}
+
+.message.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
+}
+
+.message h2 {
+    font-size: clamp(25px, 5vw, 45px);
+    margin-bottom: 15px;
+}
+
+.message p {
+    color: #ddd;
+    font-size: 18px;
+}
+
+/* Floating particles */
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: white;
+    border-radius: 50%;
+    opacity: .4;
+    animation: float 8s linear infinite;
+}
+
+/* Animations */
+
+@keyframes lightsOn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes questionIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scoreReveal {
+    0% {
+        opacity: 0;
+        transform: scale(.4);
+    }
+
+    70% {
+        opacity: 1;
+        transform: scale(1.12);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: .5;
+    }
+
+    100% {
+        transform: translateY(-20vh);
+        opacity: 0;
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+
+    .question {
+        letter-spacing: 1px;
+    }
+
+    .score {
+        letter-spacing: 3px;
+    }
+
+    .teams {
+        letter-spacing: 1px;
+    }
+
+    .final {
+        letter-spacing: 3px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Stadium lights -->
+<div class="stadium-light light-left"></div>
+<div class="stadium-light light-right"></div>
+
+<!-- Stadium -->
+<div class="stadium"></div>
+<div class="crowd"></div>
+
+<!-- Floating particles -->
+<div class="particle" style="left:10%; animation-delay:0s;"></div>
+<div class="particle" style="left:20%; animation-delay:2s;"></div>
+<div class="particle" style="left:35%; animation-delay:4s;"></div>
+<div class="particle" style="left:50%; animation-delay:1s;"></div>
+<div class="particle" style="left:65%; animation-delay:3s;"></div>
+<div class="particle" style="left:80%; animation-delay:5s;"></div>
+<div class="particle" style="left:90%; animation-delay:2s;"></div>
+
+<!-- Main interface -->
+<div class="container">
+
+    <div class="question">
+        YOU STILL REMEMBER? 😏
+    </div>
+
+    <div class="score">
+        1 : 0
+    </div>
+
+    <div class="teams">
+        SPAIN 🇪🇸 &nbsp; VS &nbsp; 🇦🇷 ARGENTINA
+    </div>
+
+    <div class="final">
+        WORLD CUP FINAL
+    </div>
+
+    <button onclick="showMessage()">
+        REMIND ME 😏
+    </button>
+
+</div>
+
+<!-- Popup -->
+<div class="message" id="message">
+
+    <h2>JUST A LITTLE REMINDER 😂</h2>
+
+    <p>
+        Just checking if you still remember the score...
+    </p>
+
+    <br>
+
+    <p>
+        Football never forgets. ⚽
+    </p>
+
+    <br>
+
+    <button onclick="closeMessage()">
+        CLOSE
+    </button>
+
+</div>
+
+<script>
+
+function showMessage() {
+    document.getElementById("message").classList.add("show");
+}
+
+function closeMessage() {
+    document.getElementById("message").classList.remove("show");
+}
+
+</script>
+
+</body>
+</html>
+```
